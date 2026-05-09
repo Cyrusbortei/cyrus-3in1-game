@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3-in-1 Games Pro | Cyrus Tech</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 15px;
+      color: white;
+    }
+.app {
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 20px;
+      backdrop-filter: blur(15px);
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+    }
+    h1 { font-size: 24px; margin-bottom: 5px; }
+.brand { font-size: 11px; opacity: 0.8; margin-bottom: 15px; }
+.game-select {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+.game-btn {
+      padding: 12px 5px;
+      background: rgba(0,0,0,0.3);
+      border: 2px solid transparent;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 11px;
+    }
+.game-btn.active {
+      background: #00ff88;
+      color: #1c1e21;
+      border-color: white;
+    }
+.mode-toggle {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+.mode-btn {
+      flex: 1;
+      padding: 8px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      color: white;
+      font-size: 12px;
+      cursor: pointer;
+    }
+.mode-btn.active {
+      background: #ffd32a;
+      color: #1c1e21;
+      font-weight: bold;
+    }
+.game-area {
+      background: rgba(0,0,0,0.3);
+      padding: 20px;
+      border-radius: 15px;
+      min-height: 350px;
+    }
+.hidden { display: none; }
+.choice {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      cursor: pointer;
+      margin: 5px;
+      border: none;
+      transition: all 0.2s;
+    }
+.choice:active { transform: scale(0.9); }
+.ttt-board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 15px auto;
+      width: 180px;
+    }
+.ttt-cell {
+      width: 55px;
+      height: 55px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+.ttt-cell.win { background: #00ff88; color: #1c1e21; }
+.input {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      width: 100px;
+      text-align: center;
+      font-size: 16px;
+      margin: 10px;
+    }
+.btn {
+      background: #00ff88;
+      color: #1c1e21;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 5px;
+    }
+.btn-secondary {
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+.result { font-size: 16px; margin: 15px 0; min-height: 40px; font-weight: bold; }
+.score { font-size: 13px; opacity: 0.9; margin: 10px 0; }
+.guide {
+      background: rgba(0,0,0,0.2);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      text-align: left;
+      margin-top: 15px;
+      line-height: 1.5;
+    }
+.guide h4 { color: #ffd32a; margin-bottom: 6px; font-size: 12px; }
+.footer { margin-top: 15px; font-size: 10px; opacity: 0.7; }
+.win { color: #00ff88; }
+.lose { color: #ff4757; }
+.draw { color: #ffd32a; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>3-IN-1 GAMES PRO</h1>
+    <div class="brand">CYRUS TECH</div>
+
+    <div class="game-select">
+      <button class="game-btn active" onclick="showGame('rps')">RPS</button>
+      <button class="game-btn" onclick="showGame('guess')">GUESS</button>
+      <button class="game-btn" onclick="showGame('ttt')">TIC TAC</button>
+    </div>
+
+    <!-- GAME 1: RPS -->
+    <div class="game-area" id="rps">
+      <h3>Rock Paper Scissors</h3>
+      <div class="score">You: <span id="rpsP">0</span> | CPU: <span id="rpsC">0</span> | Draws: <span id="rpsD">0</span></div>
+      <div>
+        <button class="choice" onclick="playRPS('rock')">✊</button>
+        <button class="choice" onclick="playRPS('paper')">✋</button>
+        <button class="choice" onclick="playRPS('scissors')">✌️</button>
+      </div>
+      <div class="result" id="rpsResult">Pick your move!</div>
+      <button class="btn btn-secondary" onclick="resetRPS()">Reset Scores</button>
+      <div class="guide">
+        <h4>HOW TO PLAY RPS:</h4>
+        1. Tap Rock ✊, Paper ✋, or Scissors ✌️<br>
+        2. Rock beats Scissors. Scissors beats Paper. Paper beats Rock<br>
+        3. Same move = Draw<br>
+        4. First to win 5 rounds is Champion!
+      </div>
+    </div>
+
+    <!-- GAME 2: GUESS -->
+    <div class="game-area hidden" id="guess">
+      <h3>Number Guesser 1-100</h3>
+      <div class="score">Tries: <span id="guessTries">0</span> | Best Score: <span id="guessBest">--</span></div>
+      <input type="number" class="input" id="guessInput" min="1" max="100" placeholder="1-100">
+      <button class="btn" onclick="checkGuess()">Guess</button>
+      <div class="result" id="guessResult">I picked a number 1-100</div>
+      <button class="btn btn-secondary" onclick="newGuessGame()">New Game</button>
+      <div class="guide">
+        <h4>HOW TO PLAY GUESSER:</h4>
+        1. I pick a secret number from 1 to 100<br>
+        2. Type your guess and tap Guess<br>
+        3. I’ll tell you Too High or Too Low<br>
+        4. Try to guess in fewest tries. Best Score = Lowest tries!
+      </div>
+    </div>
+
+    <!-- GAME 3: TIC TAC TOE -->
+    <div class="game-area hidden" id="ttt">
+      <h3>Tic Tac Toe</h3>
+      <div class="mode-toggle">
+        <button class="mode-btn active" onclick="setTTTMode('cpu')">VS Computer</button>
+        <button class="mode-btn" onclick="setTTTMode('2p')">2 Players</button>
+      </div>
+      <div class="score">X: <span id="tttX">0</span> | O: <span id="tttO">0</span> | Draws: <span id="tttD">0</span> | Best of 5</div>
+      <div class="score" id="tttTurn">Your turn: X</div>
+      <div class="ttt-board" id="tttBoard"></div>
+      <div class="result" id="tttResult"></div>
+      <button class="btn btn-secondary" onclick="resetTTT()">Reset Scores</button>
+      <div class="guide">
+        <h4>HOW TO PLAY TIC TAC TOE:</h4>
+        1. Get 3 in a row: horizontal, vertical, or diagonal<br>
+        2. VS Computer: You are X, Computer is O<br>
+        3. 2 Players: Pass phone. X goes first, then O<br>
+        4. Draws auto-clear. First to 5 wins = Champion!<br>
+        5. Score keeps going until someone hits 5
+      </div>
+    </div>
+
+    <div class="footer">
+      Built by Cyrus Bortei | 700 GHS Game Suite Pro
+    </div>
+  </div>
+
+  <script>
+    // GAME SWITCHER
+    function showGame(game) {
+      document.querySelectorAll('.game-area').forEach(g => g.classList.add('hidden'));
+      document.querySelectorAll('.game-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(game).classList.remove('hidden');
+      event.target.classList.add('active');
+    }
+
+    // GAME 1: RPS
+    let rpsPlayer = 0, rpsCpu = 0, rpsDraw = 0;
+    function playRPS(player) {
+      const moves = ['rock', 'paper', 'scissors'];
+      const cpu = moves[Math.floor(Math.random() * 3)];
+      const emojis = { rock: '✊', paper: '✋', scissors: '✌️' };
+      
+      let result = '';
+      let resultClass = '';
+      if (player === cpu) {
+        result = 'Draw!'; rpsDraw++; resultClass = 'draw';
+      } else if ((player === 'rock' && cpu === 'scissors') ||
+               (player === 'paper' && cpu === 'rock') ||
+               (player === 'scissors' && cpu === 'paper')) {
+        result = 'You Win!'; rpsPlayer++; resultClass = 'win';
+      } else {
+        result = 'CPU Wins!'; rpsCpu++; resultClass = 'lose';
+      }
+      
+      document.getElementById('rpsP').innerText = rpsPlayer;
+      document.getElementById('rpsC').innerText = rpsCpu;
+      document.getElementById('rpsD').innerText = rpsDraw;
+      document.getElementById('rpsResult').innerHTML = `You ${emojis[player]} vs CPU ${emojis[cpu]} = <span class="${resultClass}">${result}</span>`;
+      
+      if (rpsPlayer >= 5) {
+        document.getElementById('rpsResult').innerHTML = `<span class="win">🏆 YOU ARE CHAMPION!</span>`;
+      } else if (rpsCpu >= 5) {
+        document.getElementById('rpsResult').innerHTML = `<span class="lose">💻 CPU IS CHAMPION!</span>`;
+      }
+    }
+    function resetRPS() {
+      rpsPlayer = 0; rpsCpu = 0; rpsDraw = 0;
+      document.getElementById('rpsP').innerText = 0;
+      document.getElementById('rpsC').innerText = 0;
+      document.getElementById('rpsD').innerText = 0;
+      document.getElementById('rpsResult').innerText = 'Pick your move!';
+    }
+
+    // GAME 2: GUESS
+    let guessNum = Math.floor(Math.random() * 100) + 1;
+    let guessTries = 0;
+    let guessBest = localStorage.getItem('guessBest') || '--';
+    document.getElementById('guessBest').innerText = guessBest;
+    
+    function checkGuess() {
+      const val = parseInt(document.getElementById('guessInput').value);
+      if (!val || val < 1 || val > 100) return;
+      guessTries++;
+      document.getElementById('guessTries').innerText = guessTries;
+      
+      if (val === guessNum) {
+        document.getElementById('guessResult').innerHTML = `<span class="win">Correct! It was ${guessNum}. Won in ${guessTries} tries!</span>`;
+        if (guessBest === '--' || guessTries < parseInt(guessBest)) {
+          guessBest = guessTries;
+          localStorage.setItem('guessBest', guessBest);
+          document.getElementById('guessBest').innerText = guessBest;
+          document.getElementById('guessResult').innerHTML += `<br><span class="win">🎉 NEW BEST SCORE!</span>`;
+        }
+      } else if (val < guessNum) {
+        document.getElementById('guessResult').innerHTML = '<span class="lose">Too Low! Go Higher ↑</span>';
+      } else {
+        document.getElementById('guessResult').innerHTML = '<span class="lose">Too High! Go Lower ↓</span>';
+      }
+      document.getElementById('guessInput').value = '';
+    }
+    function newGuessGame() {
+      guessNum = Math.floor(Math.random() * 100) + 1;
+      guessTries = 0;
+      document.getElementById('guessTries').innerText = 0;
+      document.getElementById('guessResult').innerText = 'I picked a new number 1-100';
+    }
+    document.getElementById('guessInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') checkGuess();
+    });
+
+    // GAME 3: TIC TAC TOE - FIXED VERSION
+    let tttBoard = ['', '', '', '', '', '', '', '', ''];
+    let tttCurrent = 'X';
+    let tttActive = true;
+    let tttMode = 'cpu';
+    let tttScore = { X: 0, O: 0, D: 0 };
+
+    function setTTTMode(mode) {
+      tttMode = mode;
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      newTTT();
+    }
+
+    function drawTTT() {
+      const board = document.getElementById('tttBoard');
+      board.innerHTML = '';
+      tttBoard.forEach((cell, i) => {
+        board.innerHTML += `<div class="ttt-cell" onclick="playTTT(${i})">${cell}</div>`;
+      });
+    }
+
+    function playTTT(i) {
+      if (!tttActive || tttBoard[i]!== '') return;
+      tttBoard[i] = tttCurrent;
+      drawTTT();
+      
+      let winPattern = checkTTTWin();
+      if (winPattern) {
+        highlightWin(winPattern);
+        tttScore[tttCurrent]++;
+        updateTTTScore();
+        document.getElementById('tttResult').innerHTML = `<span class="win">${tttCurrent} Wins Round!</span>`;
+        tttActive = false;
+        checkTTTChampion();
+        if (tttScore.X < 5 && tttScore.O < 5) {
+          setTimeout(newRoundTTT, 1500);
+        }
+        return;
+      }
+      
+      if (!tttBoard.includes('')) {
+        tttScore.D++;
+        updateTTTScore();
+        document.getElementById('tttResult').innerHTML = `<span class="draw">Draw! New round...</span>`;
+        tttActive = false;
+        setTimeout(newRoundTTT, 1500);
+        return;
+      }
+      
+      tttCurrent = tttCurrent === 'X'? 'O' : 'X';
+      document.getElementById('tttTurn').innerText = `Turn: ${tttCurrent}`;
+      
+      if (tttMode === 'cpu' && tttCurrent === 'O' && tttActive) {
+        setTimeout(cpuMove, 600);
+      }
+    }
+
+    function cpuMove() {
+      if (!tttActive) return;
+      let emptyCells = tttBoard.map((v, i) => v === ''? i : null).filter(v => v!== null);
+      let bestMove = findBestMove();
+      let move = bestMove!== null? bestMove : emptyCells[Math.floor(Math.random() * emptyCells.length)];
+      playTTT(move);
+    }
+
+    function findBestMove() {
+      for (let i = 0; i < 9; i++) {
+        if (tttBoard[i] === '') {
+          tttBoard[i] = 'O';
+          if (checkTTTWin()) { tttBoard[i] = ''; return i; }
+          tttBoard[i] = '';
+        }
+      }
+      for (let i = 0; i < 9; i++) {
+        if (tttBoard[i] === '') {
+          tttBoard[i] = 'X';
+          if (checkTTTWin()) { tttBoard[i] = ''; return i; }
+          tttBoard[i] = '';
+        }
+      }
+      if (tttBoard[4] === '') return 4;
+      const corners = [0,2,6,8].filter(i => tttBoard[i] === '');
+      if (corners.length) return corners[Math.floor(Math.random() * corners.length)];
+      return null;
+    }
+
+    function checkTTTWin() {
+      const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+      for (let line of wins) {
+        if (tttBoard[line[0]] && tttBoard[line[0]] === tttBoard[line[1]] && tttBoard[line[0]] === tttBoard[line[2]]) {
+          return line;
+        }
+      }
+      return null;
+    }
+
+    function highlightWin(pattern) {
+      const cells = document.querySelectorAll('.ttt-cell');
+      pattern.forEach(i => cells[i].classList.add('win'));
+    }
+
+    function updateTTTScore() {
+      document.getElementById('tttX').innerText = tttScore.X;
+      document.getElementById('tttO').innerText = tttScore.O;
+      document.getElementById('tttD').innerText = tttScore.D;
+    }
+
+    function checkTTTChampion() {
+      if (tttScore.X >= 5) {
+        document.getElementById('tttResult').innerHTML = `<span class="win">🏆 X IS CHAMPION! 5 WINS!</span>`;
+        tttActive = false;
+      } else if (tttScore.O >= 5) {
+        document.getElementById('tttResult').innerHTML = `<span class="win">🏆 O IS CHAMPION! 5 WINS!</span>`;
+        tttActive = false;
+      }
+    }
+
+    function newRoundTTT() {
+      tttBoard = ['', '', '', '', '', '', '', '', ''];
+      tttCurrent = 'X';
+      tttActive = true;
+      document.getElementById('tttResult').innerText = 'New round started!';
+      document.getElementById('tttTurn').innerText = 'Turn: X';
+      drawTTT();
+    }
+
+    function newTTT() {
+      tttBoard = ['', '', '', '', '', '', '', '', ''];
+      tttCurrent = 'X';
+      tttActive = true;
+      document.getElementById('tttResult').innerText = '';
+      document.getElementById('tttTurn').innerText = 'Turn: X';
+      drawTTT();
+    }
+
+    function resetTTT() {
+      tttScore = { X: 0, O: 0, D: 0 };
+      updateTTTScore();
+      newTTT();
+    }
+
+    drawTTT();
+  </script>
+</body>
+</html>
